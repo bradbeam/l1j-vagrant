@@ -2,13 +2,14 @@ l1j_repository_url = "https://github.com/l1j/en"
 l1j_dir = "/vagrant/l1j"
 mysql_server_root_password = node["mysql"]["server_root_password"]
 l1j_db_name = "l1jdb"
-l1j_lock_dir = "/var/lock/l1j"
+l1j_lock_dir = "/vagrant/lock"
 l1j_db_dir = "#{l1j_dir}/db"
 
 package "ant"
 
 execute "l1j-clone" do
   command "git clone #{l1j_repository_url} #{l1j_dir}"
+  creates l1j_dir
 end
 
 execute "l1j-create-database" do
