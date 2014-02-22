@@ -1,5 +1,4 @@
 l1j_dir = "/vagrant/l1j"
-mysql_server_root_password = node["mysql"]["server_root_password"]
 l1j_db_name = "l1jdb"
 l1j_lock_dir = "/vagrant/lock"
 l1j_db_dir = "#{l1j_dir}/db"
@@ -12,7 +11,15 @@ execute "l1j-clone" do
 end
 
 execute "l1j-create-database" do
-  command "mysql --user=root --password=#{mysql_server_root_password} --execute \"CREATE DATABASE IF NOT EXISTS #{l1j_db_name};\""
+  command "mysql --user=root --password=#{node["mysql"]["server_root_password"]} --execute \"CREATE DATABASE IF NOT EXISTS #{l1j_db_name};\""
+end
+
+ruby_block "l1j-edit-config-server-properties" do
+  block do
+    file = Chef::Util::FileEdit.new("#{l1j_dir}/config/server.properties")
+    file.search_file_replace(/Password=\r\n/, "Password=#{node["mysql"]["server_root_password"]}\r\n")
+    file.write_file
+  end
 end
 
 directory l1j_lock_dir do
@@ -36,7 +43,7 @@ end
   lock_file = "#{l1j_lock_dir}/#{file}.lock"
   execute "l1j-execute-db-file-#{file}" do
     cwd l1j_db_dir
-    command "mysql --user=root --password=#{mysql_server_root_password} #{l1j_db_name} < #{file}"
+    command "mysql --user=root --password=#{node["mysql"]["server_root_password"]} #{l1j_db_name} < #{file}"
     not_if {
       ::File.exists?(lock_file)
     }
