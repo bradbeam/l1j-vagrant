@@ -1,0 +1,11 @@
+name             "l1j"
+maintainer       "l1j"
+maintainer_email "#l1j on Freenode IRC"
+license          "All rights reserved"
+description      "Installs/Configures l1j-en"
+version          "1.0.0"
+
+depends "apt"
+depends "git"
+depends "mysql"
+depends "java"
